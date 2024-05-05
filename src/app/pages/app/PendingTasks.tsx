@@ -2,11 +2,17 @@ import { Box, Text } from "@chakra-ui/react";
 import React from "react";
 import { Nav } from "../../components/nav/Nav";
 import Layout from "../../layout/Layout";
+import Project from "../../components/Project";
+import { useNavigate } from "react-router-dom";
 
 const PendingTasks = () => {
+    const navigate = useNavigate();
+
+    const onClickSubmitButton = () => {
+        navigate("/addtask");
+    };
     return (
         <Box w="100%" h="100%">
-            <Nav />
             <Layout
                 children={
                     <Box
@@ -15,14 +21,37 @@ const PendingTasks = () => {
                         overflowY={"auto"}
                         position={"sticky"}
                         // bg={"red"}
-                        px={{ base: "10px", sm: "10px", md: "20px" }}
+                        px={{ base: "5px", sm: "5px", md: "20px" }}
                         py="20px"
                         display={"flex"}
                         flexWrap={"wrap"}
-                        gap={"20px"}
+                        gap={{ base: "10px", sm: "10px", md: "20px" }}
                         justifyContent={"center"}
                     >
-                        <Text>Pending Task screen</Text>
+                        <Project
+                            isPendingTask={true}
+                            onClickSubmitButton={onClickSubmitButton}
+                        />
+                        <Project
+                            isPendingTask={true}
+                            onClickSubmitButton={onClickSubmitButton}
+                        />
+                        <Project
+                            isPendingTask={true}
+                            onClickSubmitButton={onClickSubmitButton}
+                        />
+                        <Project
+                            isPendingTask={true}
+                            onClickSubmitButton={onClickSubmitButton}
+                        />
+                        <Project
+                            isPendingTask={true}
+                            onClickSubmitButton={onClickSubmitButton}
+                        />
+                        <Project
+                            isPendingTask={true}
+                            onClickSubmitButton={onClickSubmitButton}
+                        />
                     </Box>
                 }
             />

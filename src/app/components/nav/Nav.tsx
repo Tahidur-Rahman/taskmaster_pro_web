@@ -6,10 +6,15 @@ import NavDrawer from "./NavDrawer";
 import { logo } from "../../constants/AppFiles";
 import { FontFamily } from "../../constants/Font";
 import { AppColors } from "../../constants/AppColors";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AppContext } from "../../context/AppContextProvider";
 
 export const Nav = () => {
+    const navigate = useNavigate();
     // nav modal/ it's for drawer
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const context = useContext(AppContext);
 
     return (
         <Box
@@ -41,7 +46,17 @@ export const Nav = () => {
 
                     {/* logo  */}
                     <Box display={{ base: "none", md: "block" }}>
-                        <Flex alignItems={"center"} cursor={"pointer"}>
+                        <Flex
+                            alignItems={"center"}
+                            cursor={"pointer"}
+                            onClick={() => {
+                                if (context) {
+                                    const { setActiveTab } = context;
+                                    setActiveTab("All Projects");
+                                }
+                                navigate("/");
+                            }}
+                        >
                             <Text
                                 mr="5px"
                                 fontSize={"18px"}
