@@ -1,33 +1,41 @@
 import { Box } from "@chakra-ui/react";
 import AllProjects from "./pages/app/AllProjects";
 import { Routes, Route } from "react-router-dom";
-import PendingTasks from "./pages/app/PendingTasks";
+import PendingTasks from "./pages/app/MySubmission";
 import { Nav } from "./components/nav/Nav";
-import AddTask from "./pages/app/AddTask";
+import SubmitTask from "./pages/app/SubmitTask";
 import { useContext } from "react";
 import { AppContext } from "./context/AppContextProvider";
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
+import AppLoading from "./pages/AppLoading";
+import MySubmission from "./pages/app/MySubmission";
+import ProjectDetails from "./pages/app/ProjectDetails";
 
 function App() {
     const context = useContext(AppContext);
-    const { user } = context || {};
+    const { user, appLoading } = context || {};
     return (
         <>
-            {user != null ? (
+            {appLoading ? (
+                <AppLoading />
+            ) : user != null ? (
                 <Box w="100%" h="auto">
                     <Nav />
                     <Routes>
                         <Route path="/" element={<AllProjects />} />
                         <Route
-                            path="/pendingtasks"
-                            element={<PendingTasks />}
+                            path="/mysubmission"
+                            element={<MySubmission />}
                         />
-                        <Route path="/addtask" element={<AddTask />} />
-                        {/* <Route
-       path="/project/:projectId/"
-       element={<SingleProject />}
-   /> */}
+                        <Route
+                            path="/submittask/:type"
+                            element={<SubmitTask />}
+                        />
+                        <Route
+                            path="/projectdetails/:projectId"
+                            element={<ProjectDetails />}
+                        />
                     </Routes>
                 </Box>
             ) : (

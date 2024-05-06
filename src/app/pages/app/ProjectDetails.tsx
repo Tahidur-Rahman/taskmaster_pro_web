@@ -1,21 +1,16 @@
-import React from "react";
-import { Nav } from "../../components/nav/Nav";
-import Layout from "../../layout/Layout";
 import { Box, Text } from "@chakra-ui/react";
-import Project from "../../components/Project";
+import React from "react";
+import Layout from "../../layout/Layout";
+import { FontFamily } from "../../constants/Font";
+import Task from "../../components/Task";
 import { useNavigate } from "react-router-dom";
 
-const AllProjects = () => {
+const ProjectDetails = () => {
     const navigate = useNavigate();
-
     const data = [0, 1, 2, 3, 4, 5, 6];
 
-    const onClickButton = (text: string) => {
-        if (text == "submit") {
-            navigate("/submittask/new");
-        } else {
-            navigate("/projectdetails/123");
-        }
+    const onClickEdit = (text: string) => {
+        navigate("/submittask/edit");
     };
     return (
         <Box w="100%" h="100%">
@@ -33,16 +28,12 @@ const AllProjects = () => {
                         flexWrap={"wrap"}
                         gap={{ base: "10px", sm: "10px", md: "20px" }}
                         justifyContent={"center"}
+                        // alignItems={"center"}
                     >
                         {data.map((item, index) => (
-                            <Project
+                            <Task
                                 key={index}
-                                onClickSubmitButton={() =>
-                                    onClickButton("submit")
-                                }
-                                onClickDetailsButton={() =>
-                                    onClickButton("details")
-                                }
+                                onClick={() => onClickEdit("edit")}
                             />
                         ))}
                     </Box>
@@ -52,4 +43,4 @@ const AllProjects = () => {
     );
 };
 
-export default AllProjects;
+export default ProjectDetails;

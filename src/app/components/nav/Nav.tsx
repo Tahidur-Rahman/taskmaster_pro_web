@@ -15,6 +15,7 @@ export const Nav = () => {
     // nav modal/ it's for drawer
     const { isOpen, onOpen, onClose } = useDisclosure();
     const context = useContext(AppContext);
+    const { user } = context || {};
 
     return (
         <Box
@@ -82,7 +83,11 @@ export const Nav = () => {
                             display={{ base: "none", md: "block" }}
                             color={AppColors.grey}
                         >
-                            Jahidul
+                            {user != null
+                                ? user.username.length > 6
+                                    ? user.username.slice(0, 6) + ".."
+                                    : user.username
+                                : "Username"}
                         </Text>
                     </Flex>
                 </Flex>

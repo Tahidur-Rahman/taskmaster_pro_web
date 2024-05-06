@@ -1,39 +1,83 @@
 import {
     Box,
     Button,
+    CSSReset,
     Flex,
     Image,
     Input,
     InputGroup,
     InputLeftElement,
     InputRightElement,
+    Spinner,
     Text,
+    useToast,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import { useContext, useState } from "react";
 import { authBg, logo } from "../../constants/AppFiles";
 import { AppColors } from "../../constants/AppColors";
 import { FontFamily } from "../../constants/Font";
 import { MdOutlineMail } from "react-icons/md";
 import { CiLock } from "react-icons/ci";
-import { IoEyeOffOutline } from "react-icons/io5";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/AppContextProvider";
 import { userDataInterface } from "../../interfaces/resuable_interfaces";
+import { FbAuth } from "../../firebase/fb_auth";
+import { alertMessage } from "../../utils/ToastAlert";
+import { validatePassword } from "../../utils/CommonFunctions";
+import { fbErrorDetect } from "../../firebase/fb_error";
+import { FirebaseFirestore } from "../../firebase/Fb_Firestore";
+import {
+    AppleLoginButton,
+    GoogleLoginButton,
+} from "react-social-login-buttons";
+import { socialButtonStyle } from "../../constants/cssStyles";
 
 const Login = () => {
     const context = useContext(AppContext);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const toast = useToast();
+    const navigate = useNavigate();
 
-    const loginUser = () => {
-        const user: userDataInterface = {
-            email: "jahidul59895@gmail.com",
-            id: "123",
-            profilePic: "",
-            username: "Jahidul",
-        };
-        if (context) {
-            const { setUser } = context;
+    const loginUser = async () => {
+        setIsLoading(true);
+        if (!email || !password) {
+            setIsLoading(false);
+            return alertMessage(
+                toast,
+                "warning",
+                "Field Alert",
+                "All Field's Required!"
+            );
+        } else {
+            if (validatePassword(password, toast)) {
+                try {
+                    const id = await FbAuth.loginWithFb(email, password);
+                    const user = await FirebaseFirestore.getCurrentUser(id);
+                    if (context) {
+                        const { setUser } = context;
+                        setUser(user);
+                    }
+                    setIsLoading(false);
+                    navigate("/");
 
-            setUser(user);
+                    alertMessage(
+                        toast,
+                        "success",
+                        "Success Alert",
+                        "Login Successfull!"
+                    );
+                } catch (error: any) {
+                    console.log(error.code);
+                    setIsLoading(false);
+                    fbErrorDetect(toast, error.code);
+                }
+            } else {
+                setIsLoading(false);
+            }
         }
     };
     return (
@@ -53,13 +97,13 @@ const Login = () => {
                 bg={AppColors.white}
                 borderRadius={"10px"}
                 px={"20px"}
-                py="50px"
+                py="30px"
                 display={"flex"}
                 flexDirection={"column"}
                 alignItems={"center"}
             >
                 <Image src={logo} alt="logo123" w="50px" h="50px" />
-                <Flex mt="20px">
+                <Flex mt="10px">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"13px"}
@@ -71,7 +115,7 @@ const Login = () => {
                         <Text
                             fontFamily={FontFamily}
                             fontSize={"12px"}
-                            color={"#5488f7"}
+                            color={AppColors.buttonColor1}
                             fontWeight={"300"}
                             ml="6px"
                             cursor={"pointer"}
@@ -81,7 +125,7 @@ const Login = () => {
                     </Link>
                 </Flex>
 
-                <Box mt="20px" w="100%">
+                <Box mt="15px" w="100%">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"13px"}
@@ -90,14 +134,18 @@ const Login = () => {
                         Email :
                     </Text>
 
-                    <InputGroup mt={"10px"} w="100%">
+                    <InputGroup mt={"5px"} w="100%">
                         <InputLeftElement pointerEvents="none">
                             <MdOutlineMail color="" />
                         </InputLeftElement>
-                        <Input />
+                        <Input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            disabled={isLoading}
+                        />
                     </InputGroup>
                 </Box>
-                <Box mt="20px" w="100%">
+                <Box mt="10px" w="100%">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"12px"}
@@ -106,31 +154,72 @@ const Login = () => {
                         Password :
                     </Text>
 
-                    <InputGroup mt={"10px"}>
-                        <InputLeftElement pointerEvents="none" fontSize="1.2em">
-                            <CiLock />
-                        </InputLeftElement>
-                        <Input />
-                        <InputRightElement>
-                            <IoEyeOffOutline color="green.500" />
-                        </InputRightElement>
-                    </InputGroup>
+                    <>
+                        <CSSReset />
+                        <InputGroup mt={"5px"}>
+                            <InputLeftElement
+                                pointerEvents="none"
+                                fontSize="1.2em"
+                            >
+                                <CiLock />
+                            </InputLeftElement>
+                            <Input
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading}
+                                type={showPassword ? "text" : "password"}
+                            />
+                            <InputRightElement
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? (
+                                    <IoEyeOffOutline cursor="pointer" />
+                                ) : (
+                                    <IoEyeOutline cursor="pointer" />
+                                )}
+                            </InputRightElement>
+                        </InputGroup>
+                    </>
                 </Box>
+
+                <Flex mt="5px" w="100%" justifyContent={"space-between"}>
+                    <Box w="49%">
+                        <GoogleLoginButton
+                            size="100%"
+                            iconSize={20}
+                            style={socialButtonStyle}
+                            onClick={() => alert("Hello")}
+                        >
+                            <span>Sign in with Google</span>
+                        </GoogleLoginButton>
+                    </Box>
+                    <Box w="49%">
+                        <AppleLoginButton
+                            size="100%"
+                            iconSize={20}
+                            style={socialButtonStyle}
+                            onClick={() => alert("Hello")}
+                        >
+                            <span>Sign in with Apple</span>
+                        </AppleLoginButton>
+                    </Box>
+                </Flex>
 
                 <Button
                     fontFamily={FontFamily}
                     fontWeight={"400"}
                     mt="20px"
                     w="100%"
-                    bg={"#5488f7"}
+                    bg={AppColors.buttonColor1}
                     color={AppColors.white}
                     fontSize={"13px"}
                     _hover={{
-                        bg: "#5488f7",
+                        bg: AppColors.buttonColor1,
                     }}
                     onClick={loginUser}
+                    disabled={isLoading}
                 >
-                    Sign In
+                    {isLoading ? <Spinner /> : "Sign Up"}
                 </Button>
             </Box>
         </Box>

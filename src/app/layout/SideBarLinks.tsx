@@ -17,8 +17,8 @@ const sidebarRoutesItem = [
         icon: dashboard,
     },
     {
-        name: "Pending Tasks",
-        route: "/pendingtasks",
+        name: "My Submission",
+        route: "/mysubmission",
         icon: projects,
     },
     {

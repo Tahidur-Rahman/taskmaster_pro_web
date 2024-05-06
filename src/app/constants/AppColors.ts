@@ -3,4 +3,5 @@ export const AppColors = {
     white: "#fff",
     grey: "grey",
     greyTwo: "#ddd",
+    buttonColor1: "#5488f7",
 };

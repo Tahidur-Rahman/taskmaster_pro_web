@@ -22,3 +22,8 @@ code {
     font-size: 16px;
     /* etc. */
 }
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}

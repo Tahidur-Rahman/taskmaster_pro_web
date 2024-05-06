@@ -1,9 +1,12 @@
-import { Box, useDisclosure } from "@chakra-ui/react";
+import { Box, useDisclosure, useToast } from "@chakra-ui/react";
 import { useContext, useRef } from "react";
 import AlertDialogComp from "../components/AlertDialogComp";
 import SideBarLinks from "./SideBarLinks";
 import { AppContext } from "../context/AppContextProvider";
 import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/firebase.config";
+import { alertMessage } from "../utils/ToastAlert";
 
 const DashBoardSidebar = () => {
     const cancelRef = useRef();
@@ -11,17 +14,23 @@ const DashBoardSidebar = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const context = useContext(AppContext);
     const navigate = useNavigate();
-    // const logout = () => {
-    //     signOut(auth).then((_) => {
-    //         if (context) {
-    //             const { setUser } = context || {};
-    //             setUser(null);
-    //             onClose();
-    //             localStorage.removeItem("userId");
-    //             router.push("/");
-    //         }
-    //     });
-    // };
+    const toast = useToast();
+
+    const logoutUser = () => {
+        signOut(auth).then((_) => {
+            if (context) {
+                const { setUser } = context || {};
+                setUser(null);
+                navigate("/");
+                alertMessage(
+                    toast,
+                    "success",
+                    "Logout Alert",
+                    "Logout Successfull!"
+                );
+            }
+        });
+    };
 
     const onClickSideLink = (name: string, routeName: string) => {
         if (context) {
@@ -53,12 +62,7 @@ const DashBoardSidebar = () => {
                 cancelRef={cancelRef}
                 isOpen={isOpen}
                 okBtnText="Logout"
-                onClickOk={() => {
-                    if (context) {
-                        const { setUser } = context;
-                        setUser(null);
-                    }
-                }}
+                onClickOk={logoutUser}
                 onClose={onClose}
                 titleText="Logout Alert"
             />

@@ -1,11 +1,9 @@
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { userDataInterface } from "../interfaces/resuable_interfaces";
-
-// import { onAuthStateChanged } from "firebase/auth";
-// import { auth } from "../firebase/firebase.config";
-// import { getCurrentUser } from "../firebase/Fb_Firestore";
-// import { userDataInterface } from "../utils/reusableTypes";
-// import { langStatusFunc } from "../util_functions/UtilFunctions";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/firebase.config";
+import { FirebaseFirestore } from "../firebase/Fb_Firestore";
+import NoNetScreen from "../pages/NoNetScreen";
 
 export interface ContextProps {
     user: userDataInterface | null;
@@ -13,6 +11,8 @@ export interface ContextProps {
 
     activeTab: string;
     setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+    appLoading: boolean;
+    setAppLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const AppContext = createContext<ContextProps | null>(null);
@@ -23,25 +23,52 @@ const AppContextProvider: React.FC<{ children: ReactNode }> = ({
     const [user, setUser] = useState<userDataInterface | null>(null);
 
     const [activeTab, setActiveTab] = useState("All Projects");
+    const [appLoading, setAppLoading] = useState(true);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-    // useEffect(() => {
-    //     onAuthStateChanged(auth, (user: any) => {
-    //         if (user) {
-    //             getCurrentUser(user.uid).then((userData: any) => {
-    //                 setUser(userData);
+    useEffect(() => {
+        const handleOnline = () => {
+            setIsOnline(true);
+        };
 
-    //                 setAppLaoding(false);
-    //             });
-    //         } else {
-    //             // console.log("not logged in user");
-    //             setUser(null);
-    //             setAppLaoding(false);
-    //         }
-    //     });
-    //     langStatusFunc(setAppLanguage);
-    // }, []);
+        const handleOffline = () => {
+            setIsOnline(false);
+        };
 
-    // console.log("contatcs", contacts);
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isOnline) {
+            onAuthStateChanged(auth, (user: any) => {
+                if (user) {
+                    FirebaseFirestore.getCurrentUser(user.uid).then(
+                        (userData: any) => {
+                            setUser(userData);
+
+                            setAppLoading(false);
+                        }
+                    );
+                } else {
+                    // console.log("not logged in user");
+                    setUser(null);
+                    setAppLoading(false);
+                }
+            });
+        } else {
+            setUser(null);
+            setAppLoading(false);
+        }
+
+        setActiveTab("All Projects");
+        // setAppLoading(false);
+    }, []);
 
     return (
         <AppContext.Provider
@@ -50,9 +77,11 @@ const AppContextProvider: React.FC<{ children: ReactNode }> = ({
                 setActiveTab,
                 user,
                 setUser,
+                appLoading,
+                setAppLoading,
             }}
         >
-            {children}
+            {isOnline ? children : <NoNetScreen />}
         </AppContext.Provider>
     );
 };

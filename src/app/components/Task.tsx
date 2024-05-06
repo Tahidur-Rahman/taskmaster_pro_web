@@ -5,16 +5,12 @@ import { FontFamily } from "../constants/Font";
 import { AppColors } from "../constants/AppColors";
 
 const img =
-    "https://i.pinimg.com/736x/90/40/03/9040034f5d635f46a4fb92128964fcca.jpg";
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREg-0l8Zmq9ZoaGkZRA-bsqW-goMQOn7aTOl6hmP3b9w&s";
 
 interface itemInterface {
-    onClickSubmitButton: any;
-    onClickDetailsButton: any;
+    onClick: any;
 }
-const Project = ({
-    onClickSubmitButton,
-    onClickDetailsButton,
-}: itemInterface) => {
+const Task = ({ onClick }: itemInterface) => {
     return (
         <Card w={{ base: "95%", sm: "45%", md: "45%" }} py="20px" mb="10px">
             <Flex
@@ -29,7 +25,7 @@ const Project = ({
                     color={AppColors.black}
                     fontSize={{ base: "14px", md: "15px" }}
                 >
-                    Project Title
+                    Task Title
                 </Text>
                 <Text
                     color={"grey"}
@@ -60,33 +56,21 @@ const Project = ({
 
             <Flex px={"10px"} pb="10px">
                 <Button
-                    mr="15px"
-                    fontFamily={FontFamily}
+                    onClick={onClick}
                     color={AppColors.white}
+                    w={{ base: "100px", md: "120px" }}
                     bg={AppColors.buttonColor1}
+                    fontFamily={FontFamily}
                     _hover={{
                         bg: AppColors.buttonColor1,
                     }}
                     fontSize={{ base: "12px", md: "14px" }}
-                    onClick={onClickDetailsButton}
                 >
-                    Details
-                </Button>
-                <Button
-                    onClick={onClickSubmitButton}
-                    color={AppColors.white}
-                    bg={"red"}
-                    fontFamily={FontFamily}
-                    _hover={{
-                        bg: "red",
-                    }}
-                    fontSize={{ base: "12px", md: "14px" }}
-                >
-                    Submit
+                    Re Submit
                 </Button>
             </Flex>
         </Card>
     );
 };
 
-export default Project;
+export default Task;

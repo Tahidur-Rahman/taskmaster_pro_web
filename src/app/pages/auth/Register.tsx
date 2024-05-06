@@ -1,39 +1,103 @@
 import {
     Box,
     Button,
+    CSSReset,
     Flex,
     Image,
     Input,
     InputGroup,
     InputLeftElement,
     InputRightElement,
+    Spinner,
     Text,
+    useToast,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { authBg, logo } from "../../constants/AppFiles";
 import { AppColors } from "../../constants/AppColors";
 import { FontFamily } from "../../constants/Font";
 import { MdOutlineMail } from "react-icons/md";
 import { CiLock } from "react-icons/ci";
-import { IoEyeOffOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/AppContextProvider";
 import { userDataInterface } from "../../interfaces/resuable_interfaces";
+import { alertMessage } from "../../utils/ToastAlert";
+import { validatePassword } from "../../utils/CommonFunctions";
+import { FbAuth } from "../../firebase/fb_auth";
+import { FirebaseFirestore } from "../../firebase/Fb_Firestore";
+import { fbErrorDetect } from "../../firebase/fb_error";
+import {
+    AppleLoginButton,
+    GoogleLoginButton,
+} from "react-social-login-buttons";
+import { socialButtonStyle } from "../../constants/cssStyles";
 
 const Register = () => {
     const context = useContext(AppContext);
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setconfirmPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const toast = useToast();
+    const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const regirsterUser = () => {
-        const user: userDataInterface = {
-            email: "jahidul59895@gmail.com",
-            id: "123",
-            profilePic: "",
-            username: "Jahidul",
-        };
-        if (context) {
-            const { setUser } = context;
+    const regirsterUser = async () => {
+        setIsLoading(true);
+        if (!email || !password || !confirmPassword) {
+            setIsLoading(false);
+            return alertMessage(
+                toast,
+                "warning",
+                "Field Alert",
+                "All Field's Required!"
+            );
+        } else if (password !== confirmPassword) {
+            setIsLoading(false);
+            return alertMessage(
+                toast,
+                "warning",
+                "Password Alert",
+                "Password not matched!"
+            );
+        } else {
+            if (validatePassword(password, toast)) {
+                try {
+                    const id = await FbAuth.fbUserRegister(email, password);
 
-            setUser(user);
+                    const user: userDataInterface = {
+                        email: email,
+                        id: id,
+                        profilePic: "",
+                        username: username,
+                    };
+
+                    await FirebaseFirestore.addUserToFB(user, id);
+                    if (context) {
+                        const { setUser } = context;
+                        setUser(user);
+                    }
+                    setIsLoading(false);
+
+                    navigate("/");
+
+                    alertMessage(
+                        toast,
+                        "success",
+                        "Success Alert",
+                        "Login Successfull!"
+                    );
+                } catch (error: any) {
+                    setIsLoading(false);
+                    console.log(error.code);
+                    fbErrorDetect(toast, error.code);
+                }
+            } else {
+                setIsLoading(false);
+            }
         }
     };
     return (
@@ -52,15 +116,15 @@ const Register = () => {
                 w="280px"
                 bg={AppColors.white}
                 borderRadius={"10px"}
-                px={"20px"}
-                py="30px"
+                px={"15px"}
+                py="20px"
                 display={"flex"}
                 flexDirection={"column"}
                 alignItems={"center"}
             >
                 <Image src={logo} alt="logo123" w="50px" h="50px" />
                 <Flex
-                    mt="15px"
+                    mt="10px"
                     flexDirection={"column"}
                     justifyContent={"center"}
                     alignItems={"center"}
@@ -76,7 +140,7 @@ const Register = () => {
                         <Text
                             fontFamily={FontFamily}
                             fontSize={"13px"}
-                            color={"#5488f7"}
+                            color={AppColors.buttonColor1}
                             fontWeight={"300"}
                             cursor={"pointer"}
                         >
@@ -85,7 +149,27 @@ const Register = () => {
                     </Link>
                 </Flex>
 
-                <Box mt="20px" w="100%">
+                <Box mt="5px" w="100%">
+                    <Text
+                        fontFamily={FontFamily}
+                        fontSize={"12px"}
+                        fontWeight={"300"}
+                    >
+                        Username :
+                    </Text>
+
+                    <InputGroup mt={"5px"} w="100%">
+                        <InputLeftElement pointerEvents="none">
+                            <MdOutlineMail color="" />
+                        </InputLeftElement>
+                        <Input
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            disabled={isLoading}
+                        />
+                    </InputGroup>
+                </Box>
+                <Box mt="5px" w="100%">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"12px"}
@@ -94,14 +178,18 @@ const Register = () => {
                         Email :
                     </Text>
 
-                    <InputGroup mt={"10px"} w="100%">
+                    <InputGroup mt={"5px"} w="100%">
                         <InputLeftElement pointerEvents="none">
                             <MdOutlineMail color="" />
                         </InputLeftElement>
-                        <Input />
+                        <Input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            disabled={isLoading}
+                        />
                     </InputGroup>
                 </Box>
-                <Box mt="20px" w="100%">
+                <Box mt="5px" w="100%">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"12px"}
@@ -110,17 +198,35 @@ const Register = () => {
                         Password :
                     </Text>
 
-                    <InputGroup mt={"10px"}>
-                        <InputLeftElement pointerEvents="none" fontSize="1.2em">
-                            <CiLock />
-                        </InputLeftElement>
-                        <Input />
-                        <InputRightElement>
-                            <IoEyeOffOutline color="green.500" />
-                        </InputRightElement>
-                    </InputGroup>
+                    <>
+                        <CSSReset />
+
+                        <InputGroup mt={"5px"}>
+                            <InputLeftElement
+                                pointerEvents="none"
+                                fontSize="1.2em"
+                            >
+                                <CiLock />
+                            </InputLeftElement>
+                            <Input
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading}
+                                type={showPassword ? "text" : "password"}
+                            />
+                            <InputRightElement
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? (
+                                    <IoEyeOffOutline cursor="pointer" />
+                                ) : (
+                                    <IoEyeOutline cursor="pointer" />
+                                )}
+                            </InputRightElement>
+                        </InputGroup>
+                    </>
                 </Box>
-                <Box mt="20px" w="100%">
+                <Box mt="5px" w="100%">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"12px"}
@@ -129,31 +235,76 @@ const Register = () => {
                         Confirm Password :
                     </Text>
 
-                    <InputGroup mt={"10px"}>
-                        <InputLeftElement pointerEvents="none" fontSize="1.2em">
-                            <CiLock />
-                        </InputLeftElement>
-                        <Input />
-                        <InputRightElement>
-                            <IoEyeOffOutline color="green.500" />
-                        </InputRightElement>
-                    </InputGroup>
+                    <>
+                        <CSSReset />
+                        <InputGroup mt={"5px"}>
+                            <InputLeftElement
+                                pointerEvents="none"
+                                fontSize="1.2em"
+                            >
+                                <CiLock />
+                            </InputLeftElement>
+                            <Input
+                                value={confirmPassword}
+                                onChange={(e) =>
+                                    setconfirmPassword(e.target.value)
+                                }
+                                disabled={isLoading}
+                                type={showConfirmPassword ? "text" : "password"}
+                            />
+                            <InputRightElement
+                                onClick={() =>
+                                    setShowConfirmPassword(!showConfirmPassword)
+                                }
+                            >
+                                {showConfirmPassword ? (
+                                    <IoEyeOffOutline cursor="pointer" />
+                                ) : (
+                                    <IoEyeOutline cursor="pointer" />
+                                )}
+                            </InputRightElement>
+                        </InputGroup>
+                    </>
                 </Box>
+
+                <Flex mt="5px" w="100%" justifyContent={"space-between"}>
+                    <Box w="49%">
+                        <GoogleLoginButton
+                            size="100%"
+                            iconSize={20}
+                            style={socialButtonStyle}
+                            onClick={() => alert("Hello")}
+                        >
+                            <span>Sign in with Google</span>
+                        </GoogleLoginButton>
+                    </Box>
+                    <Box w="49%">
+                        <AppleLoginButton
+                            size="100%"
+                            iconSize={20}
+                            style={socialButtonStyle}
+                            onClick={() => alert("Hello")}
+                        >
+                            <span>Sign in with Apple</span>
+                        </AppleLoginButton>
+                    </Box>
+                </Flex>
 
                 <Button
                     fontFamily={FontFamily}
                     fontWeight={"400"}
                     mt="20px"
                     w="100%"
-                    bg={"#5488f7"}
+                    bg={AppColors.buttonColor1}
                     color={AppColors.white}
                     fontSize={"13px"}
                     _hover={{
-                        bg: "#5488f7",
+                        bg: AppColors.buttonColor1,
                     }}
                     onClick={regirsterUser}
+                    disabled={isLoading}
                 >
-                    Sign Up
+                    {isLoading ? <Spinner /> : "Sign Up"}
                 </Button>
             </Box>
         </Box>
