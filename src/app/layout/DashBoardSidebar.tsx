@@ -1,5 +1,5 @@
 import { Box, useDisclosure, useToast } from "@chakra-ui/react";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import AlertDialogComp from "../components/AlertDialogComp";
 import SideBarLinks from "./SideBarLinks";
 import { AppContext } from "../context/AppContextProvider";
@@ -15,12 +15,14 @@ const DashBoardSidebar = () => {
     const context = useContext(AppContext);
     const navigate = useNavigate();
     const toast = useToast();
+    const [key, setKey] = useState(0);
 
     const logoutUser = () => {
         signOut(auth).then((_) => {
             if (context) {
-                const { setUser } = context || {};
+                const { setUser, setActiveTab } = context || {};
                 setUser(null);
+                setActiveTab("All Projects");
                 navigate("/");
                 alertMessage(
                     toast,
@@ -38,12 +40,18 @@ const DashBoardSidebar = () => {
             setActiveTab(name);
         }
 
+        setKey((prevKey) => prevKey + 1);
+
         if (name == "Logout") {
             onOpen();
             return;
         }
         navigate(routeName);
     };
+
+    useEffect(() => {
+        setKey((prevKey) => prevKey + 1);
+    }, []);
     return (
         <Box
             w="100%"
@@ -54,7 +62,7 @@ const DashBoardSidebar = () => {
             px="10px"
             pt={"10px"}
         >
-            <SideBarLinks onClick={onClickSideLink} />
+            <SideBarLinks key={key} onClick={onClickSideLink} />
 
             {/* logout conformation */}
             <AlertDialogComp

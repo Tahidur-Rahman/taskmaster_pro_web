@@ -40,7 +40,7 @@ export class FbAuth {
     static signInWithGoogle = () => {
         const provider = new GoogleAuthProvider();
 
-        const promise = new Promise((resolve, reject) => {
+        const promise = new Promise<userDataInterface>((resolve, reject) => {
             signInWithPopup(auth, provider)
                 .then((result) => {
                     // This gives you a Google Access Token. You can use it to access the Google API.

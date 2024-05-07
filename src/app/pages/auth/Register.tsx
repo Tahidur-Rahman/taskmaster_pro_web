@@ -12,14 +12,14 @@ import {
     Text,
     useToast,
 } from "@chakra-ui/react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { authBg, logo } from "../../constants/AppFiles";
 import { AppColors } from "../../constants/AppColors";
 import { FontFamily } from "../../constants/Font";
 import { MdOutlineMail } from "react-icons/md";
 import { CiLock } from "react-icons/ci";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/AppContextProvider";
 import { userDataInterface } from "../../interfaces/resuable_interfaces";
 import { alertMessage } from "../../utils/ToastAlert";
@@ -44,6 +44,7 @@ const Register = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isGoogleLogging, setIsGoogleLogging] = useState(false);
 
     const regirsterUser = async () => {
         setIsLoading(true);
@@ -100,6 +101,32 @@ const Register = () => {
             }
         }
     };
+
+    const googleLogin = async () => {
+        setIsGoogleLogging(true);
+        try {
+            const userData = await FbAuth.signInWithGoogle();
+            if (context) {
+                const { setUser } = context;
+                setUser(userData);
+            }
+            setIsGoogleLogging(false);
+            navigate("/");
+
+            alertMessage(
+                toast,
+                "success",
+                "Success Alert",
+                "Login Successfull!"
+            );
+        } catch (error: any) {
+            setIsGoogleLogging(false);
+            console.log(error.code);
+            fbErrorDetect(toast, error.code);
+        } finally {
+            setIsGoogleLogging(false);
+        }
+    };
     return (
         <Box
             w="100%"
@@ -107,10 +134,11 @@ const Register = () => {
             display="flex"
             justifyContent="center"
             alignItems="center"
-            bgImage={`url(${authBg})`}
-            bgPosition="center"
-            bgRepeat="no-repeat"
-            bgSize="cover"
+            bgColor={AppColors.buttonColor1}
+            // bgImage={`url(${authBg})`}
+            // bgPosition="center"
+            // bgRepeat="no-repeat"
+            // bgSize="cover"
         >
             <Box
                 w="280px"
@@ -267,34 +295,29 @@ const Register = () => {
                     </>
                 </Box>
 
-                <Flex mt="5px" w="100%" justifyContent={"space-between"}>
-                    <Box w="49%">
-                        <GoogleLoginButton
-                            size="100%"
-                            iconSize={20}
-                            style={socialButtonStyle}
-                            onClick={() => alert("Hello")}
-                        >
-                            <span>Sign in with Google</span>
-                        </GoogleLoginButton>
-                    </Box>
-                    <Box w="49%">
-                        <AppleLoginButton
-                            size="100%"
-                            iconSize={20}
-                            style={socialButtonStyle}
-                            onClick={() => alert("Hello")}
-                        >
-                            <span>Sign in with Apple</span>
-                        </AppleLoginButton>
-                    </Box>
+                <Flex mt="10px" w="63%" alignSelf={"center"}>
+                    <GoogleLoginButton
+                        size="40px"
+                        iconSize={25}
+                        style={socialButtonStyle}
+                        onClick={googleLogin}
+                    >
+                        <span>
+                            {isGoogleLogging ? (
+                                <Spinner ml="10px" size={"sm"} />
+                            ) : (
+                                "Sign in with Google"
+                            )}
+                        </span>
+                    </GoogleLoginButton>
                 </Flex>
 
                 <Button
                     fontFamily={FontFamily}
                     fontWeight={"400"}
-                    mt="20px"
-                    w="100%"
+                    mt="10px"
+                    w="60%"
+                    alignSelf={"center"}
                     bg={AppColors.buttonColor1}
                     color={AppColors.white}
                     fontSize={"13px"}

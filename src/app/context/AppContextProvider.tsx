@@ -1,5 +1,8 @@
 import React, { createContext, useState, ReactNode, useEffect } from "react";
-import { userDataInterface } from "../interfaces/resuable_interfaces";
+import {
+    projectInterface,
+    userDataInterface,
+} from "../interfaces/resuable_interfaces";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import { FirebaseFirestore } from "../firebase/Fb_Firestore";
@@ -11,6 +14,10 @@ export interface ContextProps {
 
     activeTab: string;
     setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+    selectedProjectDetails: projectInterface | null;
+    setselectedProjectDetails: React.Dispatch<
+        React.SetStateAction<projectInterface | null>
+    >;
     appLoading: boolean;
     setAppLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -23,6 +30,8 @@ const AppContextProvider: React.FC<{ children: ReactNode }> = ({
     const [user, setUser] = useState<userDataInterface | null>(null);
 
     const [activeTab, setActiveTab] = useState("All Projects");
+    const [selectedProjectDetails, setselectedProjectDetails] =
+        useState<projectInterface | null>(null);
     const [appLoading, setAppLoading] = useState(true);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -79,6 +88,8 @@ const AppContextProvider: React.FC<{ children: ReactNode }> = ({
                 setUser,
                 appLoading,
                 setAppLoading,
+                selectedProjectDetails,
+                setselectedProjectDetails,
             }}
         >
             {isOnline ? children : <NoNetScreen />}

@@ -1,10 +1,16 @@
 import { Box, Text } from "@chakra-ui/react";
-import React from "react";
-import { AppColors } from "../constants/AppColors";
+import { useEffect } from "react";
 import { authBg } from "../constants/AppFiles";
+import { AppColors } from "../constants/AppColors";
 import { FontFamily } from "../constants/Font";
+import { useNavigate } from "react-router-dom";
 
-const NoNetScreen = () => {
+const NotFoundPage = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        navigate("/");
+    }, []);
     return (
         <Box
             w="100%"
@@ -19,10 +25,10 @@ const NoNetScreen = () => {
             // bgSize="cover"
         >
             <Text color={AppColors.white} fontFamily={FontFamily}>
-                No Internet Connection.....
+                404 Not Found!
             </Text>
         </Box>
     );
 };
 
-export default NoNetScreen;
+export default NotFoundPage;

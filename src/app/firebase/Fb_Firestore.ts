@@ -13,9 +13,13 @@ import {
     setDoc,
     where,
 } from "firebase/firestore";
-import { db } from "./firebase.config";
+import { auth, db } from "./firebase.config";
 import { Dispatch, SetStateAction } from "react";
-import { userDataInterface } from "../interfaces/resuable_interfaces";
+import {
+    projectInterface,
+    taskInterface,
+    userDataInterface,
+} from "../interfaces/resuable_interfaces";
 
 export class FirebaseFirestore {
     // create a user
@@ -38,105 +42,113 @@ export class FirebaseFirestore {
         return user as userDataInterface;
     };
 
-    static getRealtimeUserInfo = async (
-        id: string,
-        setUser: Dispatch<SetStateAction<userDataInterface | null>>
+    // get all projects which in are added or created
+    static getMyProjects = async (
+        setProjects: Dispatch<SetStateAction<projectInterface[] | []>>
     ) => {
-        onSnapshot(doc(db, "Users", id), (doc) => {
-            setUser(doc.data() as userDataInterface);
+        const q = query(
+            collection(db, "Projects"),
+            where("assignedTo", "array-contains", auth.currentUser?.email),
+            orderBy("updatedAt", "desc")
+        );
+
+        onSnapshot(q, (querySnapshot) => {
+            const projects: projectInterface[] = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data() as projectInterface;
+                projects.push(data);
+            });
+            setProjects(projects);
+        });
+    };
+
+    //  get just you submitted tasks
+    static getAllMySubmittedTasks = async (
+        setMyAddedTasks: Dispatch<SetStateAction<taskInterface[] | []>>,
+        setProjectImages: Dispatch<SetStateAction<string[]>>
+    ) => {
+        //  getting user have access projects
+        const q = query(
+            collection(db, "Projects"),
+            where("assignedTo", "array-contains", auth.currentUser?.email)
+        );
+        let tasks: taskInterface[] = [];
+        let pImages: string[] = [];
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            tasks = [];
+            pImages = [];
+            querySnapshot.forEach((doc) => {
+                let projectData = doc.data() as projectInterface;
+                pImages.push(projectData.pImage);
+                const pq = query(
+                    collection(db, "Projects", projectData.pId, "Tasks"),
+                    where("creatorId", "==", auth.currentUser?.uid)
+                    // orderBy("updatedAt", "desc")
+                );
+                const unsubscribeTask = onSnapshot(pq, (pquerySnap) => {
+                    pquerySnap.forEach((doc) => {
+                        tasks.push(doc.data() as taskInterface);
+                    });
+                    // console.log("tasks length ************", tasks.length);
+                    // console.log("pImages length ************", pImages.length);
+                    setMyAddedTasks(tasks);
+                    setProjectImages(pImages);
+                });
+            });
+        });
+
+        // Remember to unsubscribe when component unmounts
+        return unsubscribe;
+    };
+
+    //  get single project all tasks
+    static getProjectAllTasks = async (
+        setTasks: Dispatch<SetStateAction<taskInterface[] | []>>,
+        projectId: string
+    ) => {
+        const q = query(
+            collection(db, "Projects", projectId, "Tasks"),
+            orderBy("updatedAt", "desc")
+        );
+
+        onSnapshot(q, (querySnapshot) => {
+            const tasks: taskInterface[] = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data() as taskInterface;
+                tasks.push(data);
+            });
+            setTasks(tasks);
+        });
+    };
+
+    //  add new task to project
+    static addTaskToProject = async (
+        data: taskInterface,
+        projectId: string
+    ) => {
+        // add data to allads collection
+        const docRef = await addDoc(
+            collection(db, "Projects", projectId, "Tasks"),
+            data
+        );
+
+        // update the uid
+        await FirebaseFirestore.updateProjectId(
+            docRef.id,
+            { taskId: docRef.id },
+            projectId
+        );
+    };
+
+    // update tasks data
+    static updateProjectId = async (
+        docId: string,
+        data: any,
+        projectId: string
+    ) => {
+        await setDoc(doc(db, "Projects", projectId, "Tasks", docId), data, {
+            merge: true,
         });
     };
 }
-
-// add a ad to firestore
-// export const addAdToFB = async (info: adInterface) => {
-//     // add data to allads collection
-//     const docRef = await addDoc(collection(db, "Allads"), info);
-
-//     // update the uid
-//     await upDateAdData(docRef.id, { adUid: docRef.id });
-// };
-
-// export const upDateAdData = async (docId: string, data: any) => {
-//     await setDoc(doc(db, "Allads", docId), data, { merge: true });
-// };
-
-// export const getMyFavAds = async (userId: string) => {
-//     const q = query(
-//         collection(db, "Allads"),
-//         where("addToFavBy", "array-contains", userId)
-//     );
-
-//     let catBaseAds: adInterface[] = [];
-//     const querySnapshot = await getDocs(q);
-
-//     querySnapshot.forEach((doc) => {
-//         const data = doc.data() as adInterface;
-//         catBaseAds.push(data);
-//     });
-
-//     return catBaseAds;
-// };
-
-// get single ad
-// export const getSingleAd = async (adId: string) => {
-//     const adRef = doc(db, "Allads", adId);
-//     const adData = await getDoc(adRef);
-
-//     let ad;
-//     if (adData) {
-//         ad = adData.data() as adInterface;
-//     } else {
-//         ad = null;
-//     }
-
-//     return ad;
-// };
-
-// get category based ads
-
-// export const getCategoryBasedAds = async (category: string, adUid: string) => {
-//     const q = query(
-//         collection(db, "Allads"),
-//         where("category", "==", category)
-//     );
-
-//     let catBaseAds: adInterface[] = [];
-//     const querySnapshot = await getDocs(q);
-
-//     querySnapshot.forEach((doc) => {
-//         const data = doc.data() as adInterface;
-
-//         // Exclude same id!!
-//         if (data.adUid !== adUid) {
-//             catBaseAds.push(data);
-//         }
-//     });
-
-//     return catBaseAds;
-// };
-
-// // get all my ads
-
-// export const getAllMyAds = async (userUid: string) => {
-//     const q = query(
-//         collection(db, "Allads"),
-//         where("posterUid", "==", userUid),
-//         orderBy("postTime", "desc")
-//     );
-
-//     let userAds: adInterface[] = [];
-//     const querySnapshot = await getDocs(q);
-
-//     querySnapshot.forEach((doc) => {
-//         const data = doc.data() as adInterface;
-//         userAds.push(data);
-//     });
-
-//     return userAds;
-// };
-
-// // delete my ad
-// export const deleteMyAd = async (adId: string) => {
-//     await deleteDoc(doc(db, "Allads", adId));
-// };

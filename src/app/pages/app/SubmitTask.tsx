@@ -5,10 +5,12 @@ import {
     Image,
     Input,
     Select,
+    Spinner,
     Text,
     Textarea,
+    useToast,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Layout from "../../layout/Layout";
 import { FontFamily } from "../../constants/Font";
 import { IoArrowBackOutline } from "react-icons/io5";
@@ -17,13 +19,64 @@ import { AppColors } from "../../constants/AppColors";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AppContext } from "../../context/AppContextProvider";
+import { taskInterface } from "../../interfaces/resuable_interfaces";
+import { FirebaseFirestore } from "../../firebase/Fb_Firestore";
+import { alertMessage } from "../../utils/ToastAlert";
 
 const img =
     "https://i.pinimg.com/736x/90/40/03/9040034f5d635f46a4fb92128964fcca.jpg";
+
 const SubmitTask = () => {
     const [startDate, setStartDate] = useState(new Date());
+    const context = useContext(AppContext);
+    const { selectedProjectDetails, user } = context || {};
     const { type } = useParams();
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const toast = useToast();
+
+    const onClickSubmit = async () => {
+        if (type == "new") {
+            setLoading(true);
+            try {
+                const taskData: taskInterface = {
+                    createdAt: Date.now(),
+                    creatorId: user ? user.id : "",
+                    description: description,
+                    dueDate:
+                        selectedProjectDetails != null
+                            ? selectedProjectDetails.pTime
+                            : "",
+                    taskId: "",
+                    title: title,
+                    updatedAt: Date.now(),
+                };
+
+                await FirebaseFirestore.addTaskToProject(
+                    taskData,
+                    selectedProjectDetails != null
+                        ? selectedProjectDetails?.pId
+                        : ""
+                );
+                setLoading(false);
+                navigate("/");
+
+                alertMessage(
+                    toast,
+                    "success",
+                    "Task Alert",
+                    "Task Submitted Successfull!"
+                );
+            } catch (error) {
+                setLoading(false);
+            }
+        } else {
+        }
+    };
     return (
         <Box w="100%" h="100%">
             <Layout
@@ -44,7 +97,7 @@ const SubmitTask = () => {
                                 fontFamily={FontFamily}
                                 fontWeight={"600"}
                             >
-                                {type == "new" ? "Submit" : "Edit"} Task
+                                {type == "new" ? "Submit" : "Re Submit"} Task
                             </Text>
 
                             <Box mt="30px">
@@ -60,6 +113,9 @@ const SubmitTask = () => {
                                     _placeholder={{
                                         fontFamily: FontFamily,
                                     }}
+                                    disabled={loading}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
                                 />
                             </Box>
                             <Box mt="30px">
@@ -75,6 +131,11 @@ const SubmitTask = () => {
                                         fontFamily: FontFamily,
                                     }}
                                     placeholder="Description..."
+                                    disabled={loading}
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(e.target.value)
+                                    }
                                 ></Textarea>
                             </Box>
                             {/* <Box mt="30px" w="100%">
@@ -102,7 +163,11 @@ const SubmitTask = () => {
                                     Select a new map :
                                 </Text>
                                 <Image
-                                    src={img}
+                                    src={
+                                        selectedProjectDetails != null
+                                            ? selectedProjectDetails.pImage
+                                            : img
+                                    }
                                     w="50%"
                                     h={{
                                         base: "120px",
@@ -133,7 +198,7 @@ const SubmitTask = () => {
                         </Box> */}
 
                             <Button
-                                onClick={() => {}}
+                                onClick={onClickSubmit}
                                 color={AppColors.white}
                                 w="20%"
                                 h="45px"
@@ -146,7 +211,7 @@ const SubmitTask = () => {
                                 }}
                                 fontSize={{ base: "12px", md: "14px" }}
                             >
-                                Submit
+                                {loading ? <Spinner /> : "Submit"}
                             </Button>
                         </Box>
                     </Box>

@@ -11,6 +11,7 @@ import Login from "./pages/auth/Login";
 import AppLoading from "./pages/AppLoading";
 import MySubmission from "./pages/app/MySubmission";
 import ProjectDetails from "./pages/app/ProjectDetails";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
     const context = useContext(AppContext);
@@ -36,12 +37,14 @@ function App() {
                             path="/projectdetails/:projectId"
                             element={<ProjectDetails />}
                         />
+                        <Route path="*" element={<NotFoundPage />} />
                     </Routes>
                 </Box>
             ) : (
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             )}
         </>

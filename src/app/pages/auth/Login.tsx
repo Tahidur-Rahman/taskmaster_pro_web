@@ -38,6 +38,7 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isGoogleLogging, setIsGoogleLogging] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
@@ -80,6 +81,32 @@ const Login = () => {
             }
         }
     };
+
+    const googleLogin = async () => {
+        setIsGoogleLogging(true);
+        try {
+            const userData = await FbAuth.signInWithGoogle();
+            if (context) {
+                const { setUser } = context;
+                setUser(userData);
+            }
+            setIsGoogleLogging(false);
+            navigate("/");
+
+            alertMessage(
+                toast,
+                "success",
+                "Success Alert",
+                "Login Successfull!"
+            );
+        } catch (error: any) {
+            setIsGoogleLogging(false);
+            console.log(error.code);
+            fbErrorDetect(toast, error.code);
+        } finally {
+            setIsGoogleLogging(false);
+        }
+    };
     return (
         <Box
             w="100%"
@@ -87,10 +114,11 @@ const Login = () => {
             display="flex"
             justifyContent="center"
             alignItems="center"
-            bgImage={`url(${authBg})`}
-            bgPosition="center"
-            bgRepeat="no-repeat"
-            bgSize="cover"
+            bgColor={AppColors.buttonColor1}
+            // bgImage={`url(${authBg})`}
+            // bgPosition="center"
+            // bgRepeat="no-repeat"
+            // bgSize="cover"
         >
             <Box
                 w="280px"
@@ -182,34 +210,29 @@ const Login = () => {
                     </>
                 </Box>
 
-                <Flex mt="5px" w="100%" justifyContent={"space-between"}>
-                    <Box w="49%">
-                        <GoogleLoginButton
-                            size="100%"
-                            iconSize={20}
-                            style={socialButtonStyle}
-                            onClick={() => alert("Hello")}
-                        >
-                            <span>Sign in with Google</span>
-                        </GoogleLoginButton>
-                    </Box>
-                    <Box w="49%">
-                        <AppleLoginButton
-                            size="100%"
-                            iconSize={20}
-                            style={socialButtonStyle}
-                            onClick={() => alert("Hello")}
-                        >
-                            <span>Sign in with Apple</span>
-                        </AppleLoginButton>
-                    </Box>
+                <Flex mt="10px" w="63%" alignSelf={"center"}>
+                    <GoogleLoginButton
+                        size="40px"
+                        iconSize={25}
+                        style={socialButtonStyle}
+                        onClick={googleLogin}
+                    >
+                        <span>
+                            {isGoogleLogging ? (
+                                <Spinner ml="10px" size={"sm"} />
+                            ) : (
+                                "Sign in with Google"
+                            )}
+                        </span>
+                    </GoogleLoginButton>
                 </Flex>
 
                 <Button
                     fontFamily={FontFamily}
                     fontWeight={"400"}
-                    mt="20px"
-                    w="100%"
+                    mt="10px"
+                    w="60%"
+                    alignSelf={"center"}
                     bg={AppColors.buttonColor1}
                     color={AppColors.white}
                     fontSize={"13px"}
