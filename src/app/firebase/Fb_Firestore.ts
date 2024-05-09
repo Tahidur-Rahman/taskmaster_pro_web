@@ -64,8 +64,7 @@ export class FirebaseFirestore {
 
     //  get just you submitted tasks
     static getAllMySubmittedTasks = async (
-        setMyAddedTasks: Dispatch<SetStateAction<taskInterface[] | []>>,
-        setProjectImages: Dispatch<SetStateAction<string[]>>
+        setMyAddedTasks: Dispatch<SetStateAction<taskInterface[] | []>>
     ) => {
         //  getting user have access projects
         const q = query(
@@ -73,17 +72,16 @@ export class FirebaseFirestore {
             where("assignedTo", "array-contains", auth.currentUser?.email)
         );
         let tasks: taskInterface[] = [];
-        let pImages: string[] = [];
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             tasks = [];
-            pImages = [];
             querySnapshot.forEach((doc) => {
                 let projectData = doc.data() as projectInterface;
-                pImages.push(projectData.pImage);
                 const pq = query(
                     collection(db, "Projects", projectData.pId, "Tasks"),
-                    where("creatorId", "==", auth.currentUser?.uid)
+                    where("creatorId", "==", auth.currentUser?.uid),
+                    where("type", "==", "submitted task"),
+                    orderBy("updatedAt", "asc")
                     // orderBy("updatedAt", "desc")
                 );
                 const unsubscribeTask = onSnapshot(pq, (pquerySnap) => {
@@ -91,15 +89,13 @@ export class FirebaseFirestore {
                         tasks.push(doc.data() as taskInterface);
                     });
                     // console.log("tasks length ************", tasks.length);
-                    // console.log("pImages length ************", pImages.length);
                     setMyAddedTasks(tasks);
-                    setProjectImages(pImages);
                 });
             });
         });
 
         // Remember to unsubscribe when component unmounts
-        return unsubscribe;
+        // return unsubscribe;
     };
 
     //  get single project all tasks

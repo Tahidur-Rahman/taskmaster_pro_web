@@ -183,26 +183,6 @@ const Register = () => {
                         fontSize={"12px"}
                         fontWeight={"300"}
                     >
-                        Username :
-                    </Text>
-
-                    <InputGroup mt={"5px"} w="100%">
-                        <InputLeftElement pointerEvents="none">
-                            <MdOutlineMail color="" />
-                        </InputLeftElement>
-                        <Input
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            disabled={isLoading}
-                        />
-                    </InputGroup>
-                </Box>
-                <Box mt="5px" w="100%">
-                    <Text
-                        fontFamily={FontFamily}
-                        fontSize={"12px"}
-                        fontWeight={"300"}
-                    >
                         Email :
                     </Text>
 
@@ -298,7 +278,7 @@ const Register = () => {
                 <Flex mt="10px" w="63%" alignSelf={"center"}>
                     <GoogleLoginButton
                         size="40px"
-                        iconSize={25}
+                        iconSize={16}
                         style={socialButtonStyle}
                         onClick={googleLogin}
                     >

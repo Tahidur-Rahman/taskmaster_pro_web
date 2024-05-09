@@ -1,7 +1,8 @@
 import { FontFamily } from "./Font";
 
 export const socialButtonStyle = {
-    fontSize: "11px",
+    fontSize: "10px",
     borderRadius: "5px",
     fontFamily: FontFamily,
+    fontWeight: "500",
 };

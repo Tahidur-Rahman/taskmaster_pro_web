@@ -15,20 +15,12 @@ const AllProjects = () => {
     const [loadingProjects, setLoadingProjects] = useState(true);
     const context = useContext(AppContext);
 
-    const onClickButton = (text: string, project: projectInterface) => {
-        if (text == "submit") {
-            if (context) {
-                const { setselectedProjectDetails } = context || {};
-                setselectedProjectDetails(project);
-            }
-            navigate("/submittask/new");
-        } else {
-            if (context) {
-                const { setselectedProjectDetails } = context || {};
-                setselectedProjectDetails(project);
-            }
-            navigate(`/projectdetails/${project.pId}`);
+    const onClickButton = (project: projectInterface) => {
+        if (context) {
+            const { setselectedProjectDetails } = context || {};
+            setselectedProjectDetails(project);
         }
+        navigate(`/projectdetails/${project.pId}`);
     };
 
     useEffect(() => {
@@ -84,11 +76,8 @@ const AllProjects = () => {
                                 >
                                     <Project
                                         project={item}
-                                        onClickSubmitButton={() =>
-                                            onClickButton("submit", item)
-                                        }
                                         onClickDetailsButton={() =>
-                                            onClickButton("details", item)
+                                            onClickButton(item)
                                         }
                                     />
                                 </Box>

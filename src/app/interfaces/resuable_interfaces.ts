@@ -25,4 +25,8 @@ export interface taskInterface {
     title: string;
     createdAt: number;
     updatedAt: number;
+    type: string;
+    status: string;
+    imageUrl: string;
+    projectId: string;
 }

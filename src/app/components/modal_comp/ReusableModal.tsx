@@ -16,7 +16,7 @@ const ReusableModal = ({
     isOpen,
     onClose,
     children,
-    modalSizeInMd = "2xl",
+    modalSizeInMd = "md",
     noFullInSm = false,
 }: modalCompInterface) => {
     return (

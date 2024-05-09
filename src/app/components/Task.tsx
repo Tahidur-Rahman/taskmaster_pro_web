@@ -11,10 +11,16 @@ const img =
 
 interface itemInterface {
     onClick: any;
+    onClickResubmit: any;
     task: taskInterface;
-    projectImageUrl: string;
+    projectImageUrl?: string;
 }
-const Task = ({ onClick, task, projectImageUrl }: itemInterface) => {
+const Task = ({
+    onClick,
+    task,
+    projectImageUrl,
+    onClickResubmit,
+}: itemInterface) => {
     return (
         <Card
             w={{ base: "98%", sm: "97%", md: "97%" }}
@@ -23,7 +29,13 @@ const Task = ({ onClick, task, projectImageUrl }: itemInterface) => {
             mb="10px"
         >
             <Image
-                src={projectImageUrl != "" ? projectImageUrl : img}
+                src={
+                    task.type == "task"
+                        ? projectImageUrl != ""
+                            ? projectImageUrl
+                            : img
+                        : task.imageUrl
+                }
                 w="100%"
                 h={{ base: "150px", sm: "160px", md: "200px" }}
                 alt="projectImage"
@@ -31,53 +43,120 @@ const Task = ({ onClick, task, projectImageUrl }: itemInterface) => {
                 borderTopRightRadius={"5px"}
             />
 
-            <Flex
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                px={"10px"}
-                pt="10px"
-            >
+            <Flex px={"10px"} mt="5px" justifyContent={"space-between"}>
                 <Text
-                    fontFamily={FontFamily}
-                    fontWeight={"600"}
-                    color={AppColors.black}
-                    fontSize={{ base: "14px", md: "15px" }}
-                >
-                    {task.title}
-                </Text>
-                <Text
-                    color={"grey"}
+                    color={AppColors.grey}
                     fontSize={{ base: "10px", md: "12px" }}
                     fontFamily={FontFamily}
+                    fontWeight={"600"}
+                >
+                    Due Date :
+                </Text>
+                <Text
+                    color={AppColors.black}
+                    fontSize={{ base: "10px", md: "12px" }}
+                    fontFamily={FontFamily}
+                    ml="5px"
                 >
                     {task.dueDate.slice(0, 10)}
                 </Text>
-                {/* <HiDotsVertical /> */}
             </Flex>
-            <Text
-                px={"10px"}
-                py="10px"
-                fontFamily={FontFamily}
-                fontSize={{ base: "12px", sm: "13px", md: "15px" }}
-                // color={AppColors.grey}
-            >
-                {task.description}
-            </Text>
 
-            <Flex px={"10px"} pb="10px">
-                <Button
-                    onClick={onClick}
-                    color={AppColors.white}
-                    w={{ base: "100px", md: "120px" }}
-                    bg={AppColors.buttonColor1}
+            <Box px={"10px"} pt="10px">
+                <Text
                     fontFamily={FontFamily}
-                    _hover={{
-                        bg: AppColors.buttonColor1,
-                    }}
-                    fontSize={{ base: "12px", md: "14px" }}
+                    fontWeight={"600"}
+                    color={AppColors.grey}
+                    fontSize={{ base: "10px", md: "12px" }}
                 >
-                    Re Submit
-                </Button>
+                    {task.type == "task" ? "Task" : "Submitted task"} Name :
+                </Text>
+                <Text
+                    fontFamily={FontFamily}
+                    fontWeight={"500"}
+                    color={AppColors.black}
+                    fontSize={{ base: "12px", md: "14px" }}
+                    // mt={"6px"}
+                >
+                    {task.title}
+                </Text>
+
+                {/* <HiDotsVertical /> */}
+            </Box>
+            <Box px="10px" mt="6px">
+                <Text
+                    fontFamily={FontFamily}
+                    fontWeight={"600"}
+                    color={AppColors.grey}
+                    fontSize={{ base: "10px", md: "12px" }}
+                >
+                    {task.type == "task"
+                        ? "Description"
+                        : "Submitted Description"}
+                    :
+                </Text>
+                <Text
+                    fontFamily={FontFamily}
+                    fontSize={{ base: "12px", md: "14px" }}
+                    fontWeight={"500"}
+                    // mt={"6px"}
+                    // color={AppColors.grey}
+                >
+                    {task.description}
+                </Text>
+            </Box>
+
+            <Flex px={"10px"} py="10px">
+                {task.type !== "task" && (
+                    <Flex
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                        mr="10px"
+                        bg={task.status == "Pending" ? "#FF204E" : "#68D2E8"}
+                        px="15px"
+                        borderRadius={"5px"}
+                        py="5px"
+                    >
+                        <Text
+                            fontFamily={FontFamily}
+                            fontSize={{ base: "11px", md: "13px" }}
+                            color={AppColors.white}
+                        >
+                            {task.status}
+                        </Text>
+                    </Flex>
+                )}
+                {task.status == "Pending" && (
+                    <Button
+                        onClick={onClickResubmit}
+                        color={AppColors.white}
+                        w={{ base: "100px", md: "120px" }}
+                        bg={AppColors.buttonColor1}
+                        fontFamily={FontFamily}
+                        _hover={{
+                            bg: AppColors.buttonColor1,
+                        }}
+                        fontSize={{ base: "12px", md: "14px" }}
+                    >
+                        Re Submit
+                    </Button>
+                )}
+
+                {task.type == "task" && (
+                    <Button
+                        onClick={onClick}
+                        color={AppColors.white}
+                        w={{ base: "100px", md: "120px" }}
+                        bg={AppColors.buttonColor1}
+                        fontFamily={FontFamily}
+                        _hover={{
+                            bg: AppColors.buttonColor1,
+                        }}
+                        fontSize={{ base: "12px", md: "14px" }}
+                    >
+                        Submit
+                    </Button>
+                )}
             </Flex>
         </Card>
     );

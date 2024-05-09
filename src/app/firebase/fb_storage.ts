@@ -27,7 +27,10 @@ export const uploadFileToStorage = (image: any): Promise<string> => {
         // Convert Data URL to Blob
         const blob = await fetch(image.content).then((res) => res.blob());
 
-        const imagesRef = ref(storage, `adPictures/${Date.now() + image.name}`);
+        const imagesRef = ref(
+            storage,
+            `taskPictures/${Date.now() + image.name}`
+        );
         const uploadTask = uploadBytesResumable(imagesRef, blob);
 
         uploadTask.on(

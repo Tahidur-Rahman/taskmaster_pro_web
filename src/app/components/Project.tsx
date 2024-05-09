@@ -9,15 +9,10 @@ const img =
     "https://i.pinimg.com/736x/90/40/03/9040034f5d635f46a4fb92128964fcca.jpg";
 
 interface itemInterface {
-    onClickSubmitButton: any;
     onClickDetailsButton: any;
     project: projectInterface;
 }
-const Project = ({
-    onClickSubmitButton,
-    onClickDetailsButton,
-    project,
-}: itemInterface) => {
+const Project = ({ onClickDetailsButton, project }: itemInterface) => {
     return (
         <Card w={{ base: "98%", sm: "97%", md: "97%" }} py="20px" mb="10px">
             <Flex
@@ -71,19 +66,7 @@ const Project = ({
                     fontSize={{ base: "12px", md: "14px" }}
                     onClick={onClickDetailsButton}
                 >
-                    Details
-                </Button>
-                <Button
-                    onClick={onClickSubmitButton}
-                    color={AppColors.white}
-                    bg={"red"}
-                    fontFamily={FontFamily}
-                    _hover={{
-                        bg: "red",
-                    }}
-                    fontSize={{ base: "12px", md: "14px" }}
-                >
-                    Submit
+                    See tasks
                 </Button>
             </Flex>
         </Card>

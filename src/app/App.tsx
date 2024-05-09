@@ -3,7 +3,6 @@ import AllProjects from "./pages/app/AllProjects";
 import { Routes, Route } from "react-router-dom";
 import PendingTasks from "./pages/app/MySubmission";
 import { Nav } from "./components/nav/Nav";
-import SubmitTask from "./pages/app/SubmitTask";
 import { useContext } from "react";
 import { AppContext } from "./context/AppContextProvider";
 import Register from "./pages/auth/Register";
@@ -29,10 +28,7 @@ function App() {
                             path="/mysubmission"
                             element={<MySubmission />}
                         />
-                        <Route
-                            path="/submittask/:type"
-                            element={<SubmitTask />}
-                        />
+
                         <Route
                             path="/projectdetails/:projectId"
                             element={<ProjectDetails />}
