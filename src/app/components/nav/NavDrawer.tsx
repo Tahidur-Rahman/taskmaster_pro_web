@@ -20,9 +20,9 @@ import { AppContext } from "../../context/AppContextProvider";
 interface navDrawerInterface {
     isOpen: any;
     onClose: any;
+    onClickLogout: any;
 }
-const NavDrawer = ({ isOpen, onClose }: navDrawerInterface) => {
-    const toast = useToast();
+const NavDrawer = ({ isOpen, onClose, onClickLogout }: navDrawerInterface) => {
     const navigate = useNavigate();
     const context = useContext(AppContext);
 
@@ -34,6 +34,7 @@ const NavDrawer = ({ isOpen, onClose }: navDrawerInterface) => {
 
         if (name == "Logout") {
             onClose();
+            onClickLogout();
             return;
         }
         onClose();

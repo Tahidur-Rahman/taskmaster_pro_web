@@ -23,7 +23,7 @@ const sidebarRoutesItem = [
     },
     {
         name: "Logout",
-        route: "/",
+        route: "/user/logout",
         icon: logout,
     },
 ];
@@ -32,7 +32,6 @@ const sidebarRoutesItem = [
 const SideBarLinks = ({ onClick }: itemInterface) => {
     const context = useContext(AppContext);
     const { activeTab } = context || {};
-    const navigate = useNavigate();
 
     return (
         <Box>

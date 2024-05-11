@@ -105,6 +105,8 @@ export class FirebaseFirestore {
     ) => {
         const q = query(
             collection(db, "Projects", projectId, "Tasks"),
+            where("status", "==", "Approved"),
+            where("assignedTo", "==", auth.currentUser?.email),
             orderBy("updatedAt", "desc")
         );
 

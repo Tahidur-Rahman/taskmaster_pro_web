@@ -27,7 +27,37 @@ const Task = ({
             pb="10px"
             // h={"100%"}
             mb="10px"
+            position={"relative"}
         >
+            {/* task status label */}
+            {task.type !== "task" && (
+                <Flex
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    mr="10px"
+                    bg={
+                        task.status == "Rejected"
+                            ? "#FF204E"
+                            : task.status == "Pending"
+                            ? "blue"
+                            : "#68D2E8"
+                    }
+                    px="15px"
+                    borderRadius={"5px"}
+                    py="5px"
+                    position={"absolute"}
+                    right={"10px"}
+                    top={"15px"}
+                >
+                    <Text
+                        fontFamily={FontFamily}
+                        fontSize={{ base: "11px", md: "13px" }}
+                        color={AppColors.white}
+                    >
+                        {task.status}
+                    </Text>
+                </Flex>
+            )}
             <Image
                 src={
                     task.type == "task"
@@ -107,26 +137,7 @@ const Task = ({
             </Box>
 
             <Flex px={"10px"} py="10px">
-                {task.type !== "task" && (
-                    <Flex
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                        mr="10px"
-                        bg={task.status == "Pending" ? "#FF204E" : "#68D2E8"}
-                        px="15px"
-                        borderRadius={"5px"}
-                        py="5px"
-                    >
-                        <Text
-                            fontFamily={FontFamily}
-                            fontSize={{ base: "11px", md: "13px" }}
-                            color={AppColors.white}
-                        >
-                            {task.status}
-                        </Text>
-                    </Flex>
-                )}
-                {task.status == "Pending" && (
+                {(task.status == "Pending" || task.status == "Rejected") && (
                     <Button
                         onClick={onClickResubmit}
                         color={AppColors.white}

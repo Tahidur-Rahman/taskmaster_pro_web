@@ -29,4 +29,6 @@ export interface taskInterface {
     status: string;
     imageUrl: string;
     projectId: string;
+    assignedTo: string;
+    contractorId: string;
 }

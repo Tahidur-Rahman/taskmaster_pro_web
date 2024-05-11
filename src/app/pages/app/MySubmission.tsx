@@ -18,6 +18,7 @@ const MySubmission = () => {
 
     const onClickEdit = (item: taskInterface) => {
         // navigate("/submittask/edit");
+        // console.log(item.contractorId);
         setSingleTask(item);
         onOpen();
     };

@@ -25,6 +25,7 @@ const ProjectDetails = () => {
     const onClickEdit = (text: string, task: taskInterface) => {
         if (text == "submit") {
             setIsReSubmitTask(false);
+            setSingleTask(task);
             onOpen();
         } else {
             setIsReSubmitTask(true);

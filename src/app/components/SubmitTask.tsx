@@ -4,19 +4,16 @@ import {
     Flex,
     Image,
     Input,
-    Select,
     Spinner,
     Text,
     Textarea,
     useToast,
 } from "@chakra-ui/react";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 
-import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContextProvider";
 import { taskInterface } from "../interfaces/resuable_interfaces";
 import { FirebaseFirestore } from "../firebase/Fb_Firestore";
@@ -26,8 +23,6 @@ import { AppColors } from "../constants/AppColors";
 import { useFilePicker } from "use-file-picker";
 import { FileAmountLimitValidator } from "use-file-picker/validators";
 import { uploadFileToStorage } from "../firebase/fb_storage";
-const img =
-    "https://i.pinimg.com/736x/90/40/03/9040034f5d635f46a4fb92128964fcca.jpg";
 
 interface submitTaskInterface {
     onClose: any;
@@ -42,7 +37,6 @@ const SubmitTask = ({
     task,
     isMySubmission,
 }: submitTaskInterface) => {
-    const [startDate, setStartDate] = useState(new Date());
     const context = useContext(AppContext);
     const { selectedProjectDetails, user } = context || {};
 
@@ -166,6 +160,8 @@ const SubmitTask = ({
                         selectedProjectDetails != null
                             ? selectedProjectDetails?.pId
                             : "",
+                    assignedTo: user ? user.email : "",
+                    contractorId: task != null ? task?.contractorId : "",
                 };
 
                 await FirebaseFirestore.addTaskToProject(
@@ -244,22 +240,6 @@ const SubmitTask = ({
                             onChange={(e) => setDescription(e.target.value)}
                         ></Textarea>
                     </Box>
-                    {/* <Box mt="30px" w="100%">
-                            <Text
-                                fontFamily={FontFamily}
-                                fontSize={{ base: "12px", md: "14px" }}
-                                mb="10px"
-                            >
-                                Due Date :
-                            </Text>
-                            <DatePicker
-                                selected={startDate}
-                                onChange={(date) =>
-                                    setStartDate(date ? date : new Date())
-                                }
-                                className="custom-datepicker"
-                            />
-                        </Box> */}
 
                     <Box mt="10px">
                         <Text
@@ -318,24 +298,6 @@ const SubmitTask = ({
                             ))
                         )}
                     </Box>
-
-                    {/* select contractor */}
-                    {/* <Box mt="30px">
-                            <Text fontFamily={FontFamily} mb="10px">
-                                Select Contractor :
-                            </Text>
-                            <Select
-                                placeholder={"Select Contractor"}
-                                mt="10px"
-                                h="30px"
-                                fontSize="14px"
-                                // value={sortValue}
-                                // onChange={(e) => onClickSort(e.target.value)}
-                            >
-                                <option value="test"> test</option>
-                                <option value="test2">test2</option>
-                            </Select>
-                        </Box> */}
 
                     <Flex justifyContent={"center"} alignItems={"center"}>
                         <Button
