@@ -32,6 +32,8 @@ import {
     GoogleLoginButton,
 } from "react-social-login-buttons";
 import { socialButtonStyle } from "../../constants/cssStyles";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase/firebase.config";
 
 const Login = () => {
     const context = useContext(AppContext);
@@ -56,21 +58,30 @@ const Login = () => {
         } else {
             if (validatePassword(password, toast)) {
                 try {
-                    const id = await FbAuth.loginWithFb(email, password);
-                    const user = await FirebaseFirestore.getCurrentUser(id);
-                    if (context) {
-                        const { setUser } = context;
-                        setUser(user);
-                    }
-                    setIsLoading(false);
-                    navigate("/");
-
-                    alertMessage(
-                        toast,
-                        "success",
-                        "Success Alert",
-                        "Login Successfull!"
+                    const userCredential = await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
                     );
+                    if (userCredential.user.emailVerified) {
+                        setIsLoading(false);
+                        navigate("/");
+
+                        alertMessage(
+                            toast,
+                            "success",
+                            "Success Alert",
+                            "Login Successfull!"
+                        );
+                    } else {
+                        setIsLoading(false);
+                        alertMessage(
+                            toast,
+                            "warning",
+                            "Verification Alert",
+                            "Your account is not verified yet. Please verify to login to your account."
+                        );
+                    }
                 } catch (error: any) {
                     console.log(error.code);
                     setIsLoading(false);
@@ -121,17 +132,17 @@ const Login = () => {
             // bgSize="cover"
         >
             <Box
-                w="280px"
+                w={{ base: "280px", md: "350px" }}
+                px={{ base: "20px", md: "30px" }}
+                py={{ base: "30px", md: "50px" }}
                 bg={AppColors.white}
                 borderRadius={"10px"}
-                px={"20px"}
-                py="30px"
                 display={"flex"}
                 flexDirection={"column"}
                 alignItems={"center"}
             >
                 <Image src={logo} alt="logo123" w="50px" h="50px" />
-                <Flex mt="10px">
+                <Flex mt="15px">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"13px"}
@@ -153,7 +164,7 @@ const Login = () => {
                     </Link>
                 </Flex>
 
-                <Box mt="15px" w="100%">
+                <Box mt="20px" w="100%">
                     <Text
                         fontFamily={FontFamily}
                         fontSize={"13px"}
@@ -226,6 +237,20 @@ const Login = () => {
                         </span>
                     </GoogleLoginButton>
                 </Flex>
+
+                <Link to={"/resetpassword"}>
+                    <Text
+                        fontFamily={FontFamily}
+                        fontSize={"12px"}
+                        fontWeight={"500"}
+                        mt="10px"
+                        cursor={"pointer"}
+                        textAlign={"center"}
+                        color={AppColors.buttonColor1}
+                    >
+                        Reset Password
+                    </Text>
+                </Link>
 
                 <Button
                     fontFamily={FontFamily}

@@ -26,6 +26,7 @@ export const Nav = () => {
     // nav modal/ it's for drawer
     const { isOpen, onOpen, onClose } = useDisclosure();
     const context = useContext(AppContext);
+    const { user } = context || {};
     const cancelRef = useRef();
     const toast = useToast();
 
@@ -110,6 +111,13 @@ export const Nav = () => {
                 <Flex alignItems="center" pr={{ base: "10px", md: "0px" }}>
                     <Flex alignItems={"center"} cursor={"pointer"}>
                         <FaUserCircle size={25} />
+                        <Text
+                            ml="6px"
+                            fontFamily={FontFamily}
+                            fontSize={{ base: "11px", md: "13px" }}
+                        >
+                            {user?.email.slice(0, 6) + "..."}
+                        </Text>
                     </Flex>
                 </Flex>
 

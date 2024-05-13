@@ -75,6 +75,7 @@ const SubmitTask = ({
                     description: description,
                     title: title,
                     updatedAt: Date.now(),
+                    status: "Pending",
                 };
                 FirebaseFirestore.updateProjectId(
                     task != null ? task.taskId : "",
@@ -105,6 +106,7 @@ const SubmitTask = ({
                     title: title,
                     updatedAt: Date.now(),
                     imageUrl: imageUrl,
+                    status: "Pending",
                 };
                 FirebaseFirestore.updateProjectId(
                     task != null ? task.taskId : "",

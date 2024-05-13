@@ -11,6 +11,7 @@ import AppLoading from "./pages/AppLoading";
 import MySubmission from "./pages/app/MySubmission";
 import ProjectDetails from "./pages/app/ProjectDetails";
 import NotFoundPage from "./pages/NotFoundPage";
+import ResetPassoword from "./pages/auth/ResetPassword";
 
 function App() {
     const context = useContext(AppContext);
@@ -40,6 +41,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/resetpassword" element={<ResetPassoword />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             )}

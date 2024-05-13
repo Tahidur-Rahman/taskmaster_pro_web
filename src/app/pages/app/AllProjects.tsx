@@ -65,7 +65,7 @@ const AllProjects = () => {
                                 justifyContent={"center"}
                                 alignItems={"center"}
                             >
-                                <Text>No Projects Till Now</Text>
+                                <Text>No Assigend Projects Till Now</Text>
                             </Flex>
                         ) : (
                             projects.map((item, index) => (

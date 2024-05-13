@@ -67,7 +67,11 @@ const Register = () => {
         } else {
             if (validatePassword(password, toast)) {
                 try {
-                    const id = await FbAuth.fbUserRegister(email, password);
+                    const id = await FbAuth.fbUserRegister(
+                        email,
+                        password,
+                        toast
+                    );
 
                     const user: userDataInterface = {
                         email: email,
@@ -77,20 +81,10 @@ const Register = () => {
                     };
 
                     await FirebaseFirestore.addUserToFB(user, id);
-                    if (context) {
-                        const { setUser } = context;
-                        setUser(user);
-                    }
+
                     setIsLoading(false);
 
                     navigate("/");
-
-                    alertMessage(
-                        toast,
-                        "success",
-                        "Success Alert",
-                        "Login Successfull!"
-                    );
                 } catch (error: any) {
                     setIsLoading(false);
                     console.log(error.code);
@@ -141,11 +135,11 @@ const Register = () => {
             // bgSize="cover"
         >
             <Box
-                w="280px"
+                w={{ base: "280px", md: "350px" }}
+                px={{ base: "20px", md: "30px" }}
+                py={{ base: "30px", md: "50px" }}
                 bg={AppColors.white}
                 borderRadius={"10px"}
-                px={"15px"}
-                py="20px"
                 display={"flex"}
                 flexDirection={"column"}
                 alignItems={"center"}

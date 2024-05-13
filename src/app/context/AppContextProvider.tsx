@@ -3,7 +3,7 @@ import {
     projectInterface,
     userDataInterface,
 } from "../interfaces/resuable_interfaces";
-import { onAuthStateChanged } from "firebase/auth";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import { FirebaseFirestore } from "../firebase/Fb_Firestore";
 import NoNetScreen from "../pages/NoNetScreen";
@@ -55,15 +55,20 @@ const AppContextProvider: React.FC<{ children: ReactNode }> = ({
 
     useEffect(() => {
         if (isOnline) {
-            onAuthStateChanged(auth, (user: any) => {
+            onAuthStateChanged(auth, (user: User | null) => {
                 if (user) {
-                    FirebaseFirestore.getCurrentUser(user.uid).then(
-                        (userData: any) => {
+                    if (user.emailVerified) {
+                        FirebaseFirestore.getCurrentUser(
+                            user != null ? user.uid : ""
+                        ).then((userData: any) => {
                             setUser(userData);
 
                             setAppLoading(false);
-                        }
-                    );
+                        });
+                    } else {
+                        setUser(null);
+                        setAppLoading(false);
+                    }
                 } else {
                     // console.log("not logged in user");
                     setUser(null);

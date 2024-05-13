@@ -1,19 +1,32 @@
 import {
     GoogleAuthProvider,
     createUserWithEmailAndPassword,
+    sendEmailVerification,
     signInWithEmailAndPassword,
     signInWithPopup,
 } from "firebase/auth";
 import { auth } from "./firebase.config";
 import { userDataInterface } from "../interfaces/resuable_interfaces";
 import { FirebaseFirestore } from "./Fb_Firestore";
+import { alertMessage } from "../utils/ToastAlert";
 
 export class FbAuth {
-    static fbUserRegister = (email: any, password: any): Promise<string> => {
+    static fbUserRegister = (
+        email: any,
+        password: any,
+        toast: any
+    ): Promise<string> => {
         const promise = new Promise<string>((resolve, reject) => {
             createUserWithEmailAndPassword(auth, email, password)
                 .then((user) => {
                     resolve(user.user.uid);
+                    sendEmailVerification(user.user);
+                    alertMessage(
+                        toast,
+                        "success",
+                        "Verify Alert",
+                        "An email has been sent to your email address. Please verify to login to your account."
+                    );
                 })
                 .catch((err) => {
                     reject(err);
